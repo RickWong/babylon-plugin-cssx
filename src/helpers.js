@@ -1,4 +1,4 @@
-import { posToLoc } from "./utilities";
+import { posToLoc, eq } from "./utilities";
 
 export default function (Babylon) {
   var { Token, pp } = Babylon;
@@ -33,7 +33,7 @@ export default function (Babylon) {
   pp.cssxMatchPreviousToken = function (type, step) {
     let previous = this.cssxGetPreviousToken(step);
 
-    if (previous && previous.type === type) return true;
+    if (previous && eq.type(previous.type, type)) return true;
     return false;
   };
 
@@ -42,7 +42,7 @@ export default function (Babylon) {
 
     if (arguments.length === 1) {
       next = this.lookahead();
-      if (next && next.type === arguments[0]) return true;
+      if (next && eq.type(next.type, arguments[0])) return true;
       return false;
     } else if (arguments.length === 2) {
       old = this.state;
@@ -56,8 +56,8 @@ export default function (Babylon) {
       this.isLookahead = false;
       this.state = old;
       if (
-        nextA && nextA.type === arguments[0] &&
-        nextB && nextB.type === arguments[1]
+        nextA && eq.type(nextA.type, arguments[0]) &&
+        nextB && eq.type(nextB.type, arguments[1])
       ) {
         return true;
       }

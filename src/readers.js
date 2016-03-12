@@ -3,7 +3,7 @@ import {
   CSSXValueAllowedCodes,
   CSSXSelectorAllowedCodes
 } from "./settings";
-import { isNumber } from "./utilities";
+import { isNumber, eq } from "./utilities";
 
 export default function (Babylon) {
 
@@ -166,7 +166,7 @@ export default function (Babylon) {
 
     this.finishToken(tt.cssxProperty, property);
 
-    if (this.lookahead().type !== tt.colon) {
+    if (!eq.type(this.lookahead().type, tt.colon)) {
       this.raise(this.state.pos, "CSSX: expecting a colon after CSS property");
     }
     this.next();

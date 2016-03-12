@@ -1,3 +1,5 @@
+import { eq } from './utilities';
+
 export default function (Babylon) {
 
   var { TokenType, tt, tc } = Babylon;
@@ -17,13 +19,13 @@ export default function (Babylon) {
   tt.cssxKeyframesEnd = new TokenType("CSSXKeyframesEnd");
 
   tt.cssxRulesStart.updateContext = function (prevType) {
-    if (prevType === tt.cssxSelector) this.state.context.push(tc.cssxRules);
+    if (eq.type(prevType, tt.cssxSelector)) this.state.context.push(tc.cssxRules);
   };
   tt.cssxRulesEnd.updateContext = function (prevType) {
     if (
-      prevType === tt.cssxValue ||
-      prevType === tt.cssxRulesStart ||
-      prevType === tt.semi
+      eq.type(prevType, tt.cssxValue) ||
+      eq.type(prevType, tt.cssxRulesStart) ||
+      eq.type(prevType, tt.semi)
     ) {
       this.state.context.length -= 1; // out of cssxRules
     }

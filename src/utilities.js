@@ -30,3 +30,19 @@ export function posToLoc (pos, input, verbose) {
 export function isNumber(code) {
   return code > 47 && code < 58;
 }
+
+export var eq = {
+  context(a, b) {
+    return a.token === b.token && a.isExpr === b.isExpr && a.preserveSpace === b.preserveSpace;
+  },
+  type (a, b) {
+    return a && b && a.label === b.label &&
+      a.beforeExpr === b.beforeExpr &&
+      a.startsExpr === b.startsExpr &&
+      a.rightAssociative === b.rightAssociative &&
+      a.isLoop === b.isLoop &&
+      a.isAssign === b.isAssign &&
+      a.prefix === b.prefix &&
+      a.postfix === b.postfix;
+  }
+}

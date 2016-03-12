@@ -8,7 +8,8 @@ var d = describe;
 var babylon = require('../../babylon/lib/');
 // var babylon = require('babylon');
 
-var cssxPlugin = require('../lib');
+var cssxPlugin = require('../bin/plugin');
+// var cssxPlugin = require('../lib');
 
 var parse = function (code, opts) {
   if (!opts) opts = {};
@@ -36,7 +37,7 @@ var parse = function (code, opts) {
 
 
 var tests = [];
-// var only = 'basic/1'.split(',');
+// var only = 'mixed/45'.split(',');
 
 glob.sync(__dirname + '/cssx/**/actual.js').forEach(function (actual) {
   var testDir = path.dirname(actual), testDirParts = testDir.split('/');

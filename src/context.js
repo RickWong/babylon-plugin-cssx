@@ -1,3 +1,6 @@
+import { eq } from './utilities';
+
+
 export default function (Babylon) {
   var { TokContext, tc, pp } = Babylon;
 
@@ -14,14 +17,14 @@ export default function (Babylon) {
     pp["cssx" + name + "In"] = function () {
       const curContext = this.curContext();
 
-      if (curContext === context) return;
+      if (eq.context(curContext, context)) return;
       this.state.context.push(context);
     };
 
     pp["cssx" + name + "Out"] = function () {
       const curContext = this.curContext();
 
-      if (curContext !== context) {
+      if (!eq.context(curContext, context)) {
         this.raise(this.state.start, "CSSX: Not in " + context.token + " context");
       }
       this.state.context.length -= 1;

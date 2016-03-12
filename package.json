@@ -1,8 +1,8 @@
 {
   "name": "babylon-plugin-cssx",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "CSSX plugin to Babylon so it understands CSS in JavaScript",
-  "main": "lib/index.js",
+  "main": "bin/plugin.js",
   "directories": {
     "test": "test"
   },
@@ -30,15 +30,18 @@
     "babel-preset-es2015": "6.6.0",
     "babel-preset-stage-0": "6.5.0",
     "babel-runtime": "6.6.1",
+    "browserify": "13.0.0",
     "chai": "3.5.0",
     "glob": "7.0.3",
     "mocha": "2.4.5"
   },
   "scripts": {
     "test": "mocha --colors ./test/index.js",
+    "test-debug": "mocha debug --colors ./test/index.js",
     "test-watch": "mocha --colors -w ./test/index.js",
     "build": "babel src --out-dir lib",
     "watch": "babel src --out-dir lib --watch",
-    "release": "npm run build && npm run test"
+    "bundle": "browserify ./lib/index -o ./bin/plugin.js --standalone cssx",
+    "release": "npm run build && npm run test && npm run bundle"
   }
 }

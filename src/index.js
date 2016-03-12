@@ -2,6 +2,7 @@ import { TokenType, types as tt } from '../../babylon/lib/tokenizer/types';
 import { TokContext, types as tc } from '../../babylon/lib/tokenizer/context';
 import { Token } from '../../babylon/lib/tokenizer';
 import { isIdentifierChar, isIdentifierStart } from '../../babylon/lib/util/identifier';
+import { eq } from './utilities';
 
 var Babylon = {
   tt, tc, TokContext, Token, TokenType, isIdentifierChar, isIdentifierStart
@@ -30,7 +31,7 @@ export default function CSSX(Parser) {
 
       instance.extend('parseStatement', function (inner) {
         return function (declaration, topLevel) {
-          if (this.cssxMatchPreviousToken(tt.cssxStart) && this.curContext() !== tc.cssxDefinition) {
+          if (this.cssxMatchPreviousToken(tt.cssxStart) && !eq.context(this.curContext(), tc.cssxDefinition)) {
             this.cssxDefinitionIn();
             return this.cssxParse();
           } else if (this.match(tt.cssxSelector)) {
@@ -51,11 +52,11 @@ export default function CSSX(Parser) {
           let context = this.curContext(), blockStmtNode;
           let rules = [], lastToken;
 
-          if (context === tc.cssxRules && this.match(tt.cssxRulesStart)) {
+          if (eq.context(context, tc.cssxRules) && this.match(tt.cssxRulesStart)) {
 
             blockStmtNode = this.startNode();
             // no rules
-            if (this.match(tt.cssxRulesStart) && this.lookahead().type === tt.braceR) {
+            if (this.match(tt.cssxRulesStart) && eq.type(this.lookahead().type, tt.braceR)) {
               this.next();
             } else {
               // reading the style          
@@ -111,8 +112,8 @@ export default function CSSX(Parser) {
             // ending without semicolon
             return this.cssxStoreNextCharAsToken(tt.cssxRulesEnd);
           } else if (
-            (this.match(tt.cssxRulesEnd) && context === tc.cssxMediaQuery) ||
-            (this.match(tt.cssxRulesEnd) && context === tc.cssxKeyframes)
+            (this.match(tt.cssxRulesEnd) && eq.context(context, tc.cssxMediaQuery)) ||
+            (this.match(tt.cssxRulesEnd) && eq.context(context, tc.cssxKeyframes))
           ) {
             // end of media query
             return;
@@ -132,7 +133,7 @@ export default function CSSX(Parser) {
           }
 
           // looping through the cssx elements
-          if (context === tc.cssxDefinition || context === tc.cssxMediaQuery || context === tc.cssxKeyframes) {
+          if (eq.context(context, tc.cssxDefinition) || eq.context(context, tc.cssxMediaQuery) || eq.context(context, tc.cssxKeyframes)) {
             this.skipSpace();
             return this.cssxReadSelector();
           }
@@ -183,7 +184,7 @@ export default function CSSX(Parser) {
         let parenL, future, cState, firstInCSSX;
 
         if (
-          nextToken.type === tt.name &&
+          eq.type(nextToken.type, tt.name) &&
           nextToken.value === 'cssx' &&
           this.cssxMatchNextToken(tt.name, tt.parenL)
         ) {
@@ -194,7 +195,7 @@ export default function CSSX(Parser) {
 
           // Making sure that we don't parse
           // cssx('something') or cssx('something')
-          if (firstInCSSX.type === tt.string) {
+          if (eq.type(firstInCSSX.type, tt.string)) {
             return false;
           }
 
