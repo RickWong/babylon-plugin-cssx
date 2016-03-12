@@ -1,20 +1,14 @@
 import { stringToCode } from "./utilities";
 
-const CSSXPropertyAllowedCodes = [
+export const CSSXPropertyAllowedCodes = [
   "-"
 ].map(stringToCode);
 
-const CSSXValueAllowedCodes = [
+export const CSSXValueAllowedCodes = [
   " ", "\n", "\t", "#", ".", "-", "(", ")", "[", "]", "'", "\"", "%", ",", ":", "/", "\\", "!", "?"
 ].map(stringToCode);
 
-const CSSXSelectorAllowedCodes = [
+export const CSSXSelectorAllowedCodes = [
   " ", "*", ">", "+", "~", ".", ":", "=", "[", "]", "\"", "-",
   "!", "?", "@", "#", "$", "%", "^", "&", "'", "|", ",", "\n"
 ].map(stringToCode);
-
-export default {
-  CSSXPropertyAllowedCodes,
-  CSSXValueAllowedCodes,
-  CSSXSelectorAllowedCodes
-};
