@@ -327,6 +327,9 @@ function CSSX(Parser) {
 
       var pp = Babylon.pp = Parser.prototype;
 
+      // replacing <style> tags with cssx calls
+      instance.input = instance.input.replace(/<style>/g, 'cssx(').replace(/<\/style>/g, ')');
+
       (0, _context3.default)(Babylon);
       (0, _expressions2.default)(Babylon);
       (0, _helpers2.default)(Babylon);

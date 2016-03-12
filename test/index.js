@@ -15,6 +15,7 @@ var parse = function (code, opts) {
   if (!opts) opts = {};
   return JSON.stringify(babylon.parse(code, {
     plugins: [
+      cssxPlugin,
       'jsx',
       'flow',
       'asyncFunctions',
@@ -28,8 +29,7 @@ var parse = function (code, opts) {
       'exponentiationOperator',
       'asyncGenerators',
       'functionBind',
-      'functionSent',
-      cssxPlugin
+      'functionSent'
     ],
     sourceType: opts.sourceType || 'script'
   }), null, 2);
@@ -37,7 +37,7 @@ var parse = function (code, opts) {
 
 
 var tests = [];
-// var only = 'mixed/45'.split(',');
+// var only = 'basic/46'.split(',');
 
 glob.sync(__dirname + '/cssx/**/actual.js').forEach(function (actual) {
   var testDir = path.dirname(actual), testDirParts = testDir.split('/');

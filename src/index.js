@@ -22,6 +22,11 @@ export default function CSSX(Parser) {
 
       var pp = Babylon.pp = Parser.prototype;
 
+      // replacing <style> tags with cssx calls
+      instance.input = instance.input
+        .replace(/<style>/g, 'cssx(')
+        .replace(/<\/style>/g, ')');
+
       context(Babylon);
       expressions(Babylon);
       helpers(Babylon);
