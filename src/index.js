@@ -77,6 +77,7 @@ export default function CSSX(Parser) {
 
       instance.extend('readToken', function (inner) {
         return function (code) {
+
           let fallback = () => inner.call(this, code);
           let context = this.curContext();
 

@@ -4,10 +4,11 @@ var glob = require("glob");
 var chai = require('chai');
 var expect = chai.expect;
 var d = describe;
+
 var babylon = require('../../babylon/lib/');
-var cssxPlugin = require('../lib')
 // var babylon = require('babylon');
-var babylon = require('../../babylon/lib/');
+
+var cssxPlugin = require('../lib');
 
 var parse = function (code, opts) {
   if (!opts) opts = {};
@@ -27,7 +28,7 @@ var parse = function (code, opts) {
       'asyncGenerators',
       'functionBind',
       'functionSent',
-      cssxPlugin.default
+      cssxPlugin
     ],
     sourceType: opts.sourceType || 'script'
   }), null, 2);
@@ -35,7 +36,7 @@ var parse = function (code, opts) {
 
 
 var tests = [];
-// var only = 'errors/40'.split(',');
+// var only = 'basic/1'.split(',');
 
 glob.sync(__dirname + '/cssx/**/actual.js').forEach(function (actual) {
   var testDir = path.dirname(actual), testDirParts = testDir.split('/');
@@ -69,7 +70,7 @@ d('Given the babylon plugin', function () {
         var result;
         var resultFile = test.testDir + '/expected.result.json';
 
-        if (test.testDir.indexOf('errors/')) {
+        if (test.testDir.indexOf('errors/') >= 0) {
           try {
             result = parse(file(test.actual));
           } catch(err) {
