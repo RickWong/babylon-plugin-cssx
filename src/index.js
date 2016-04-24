@@ -44,6 +44,8 @@ export default function CSSX(Parser) {
               return this.cssxParseMediaQueryElement();
             } else if (this.cssxIsKeyFramesEntryPoint()) {
               return this.cssxParseKeyframesElement();
+            } else if (this.cssxIsNestedElement()) {
+              return this.cssxParseNestedElement();
             }
             return this.cssxParseElement();
           }
@@ -118,14 +120,16 @@ export default function CSSX(Parser) {
             return this.cssxStoreNextCharAsToken(tt.cssxRulesEnd);
           } else if (
             (this.match(tt.cssxRulesEnd) && eq.context(context, tc.cssxMediaQuery)) ||
-            (this.match(tt.cssxRulesEnd) && eq.context(context, tc.cssxKeyframes))
+            (this.match(tt.cssxRulesEnd) && eq.context(context, tc.cssxKeyframes)) ||
+            (this.match(tt.cssxRulesEnd) && eq.context(context, tc.cssxNested))
           ) {
-            // end of media query
+            // end of nested element
             return;
           } else if (
             (this.match(tt.cssxRulesEnd) && this.cssxMatchNextToken(tt.parenR)) ||
             (this.match(tt.cssxMediaQueryEnd) && this.cssxMatchNextToken(tt.parenR)) ||
-            (this.match(tt.cssxKeyframesEnd) && this.cssxMatchNextToken(tt.parenR))
+            (this.match(tt.cssxKeyframesEnd) && this.cssxMatchNextToken(tt.parenR)) ||
+            (this.match(tt.cssxNestedEnd) && this.cssxMatchNextToken(tt.parenR))
           ) {
             ++this.state.pos;
             this.finishToken(tt.cssxEnd);
@@ -138,7 +142,7 @@ export default function CSSX(Parser) {
           }
 
           // looping through the cssx elements
-          if (eq.context(context, tc.cssxDefinition) || eq.context(context, tc.cssxMediaQuery) || eq.context(context, tc.cssxKeyframes)) {
+          if (eq.context(context, tc.cssxDefinition) || eq.context(context, tc.cssxMediaQuery) || eq.context(context, tc.cssxKeyframes) || eq.context(context, tc.cssxNested)) {
             this.skipSpace();
             return this.cssxReadSelector();
           }

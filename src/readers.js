@@ -146,7 +146,7 @@ export default function (Babylon) {
   };
 
   pp.cssxReadProperty = function() {
-    let loc, pos, property, node, word;
+    let loc, pos, property, node, word, next;
 
     if (this.match(tt.cssxRulesStart)) this.next();
 
@@ -165,8 +165,9 @@ export default function (Babylon) {
     this.state.start = pos;
 
     this.finishToken(tt.cssxProperty, property);
+    next = this.lookahead();
 
-    if (!eq.type(this.lookahead().type, tt.colon)) {
+    if (!eq.type(next.type, tt.colon)) {
       this.raise(this.state.pos, "CSSX: expecting a colon after CSS property");
     }
     this.next();

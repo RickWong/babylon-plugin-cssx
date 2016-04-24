@@ -92,6 +92,24 @@ export default function (Babylon) {
     });
   };
 
+  pp.cssxParseNestedElement = function () {
+    return this.cssxParseNestedSelectors({
+      name: "CSSXNestedElement",
+      context: {
+        in: () => this.cssxNestedIn()
+      },
+      tokens: {
+        el: tt.cssxNested,
+        start: tt.cssxNestedStart,
+        end: tt.cssxNestedEnd
+      },
+      errors: {
+        unclosed: "CSSX: unclosed nested block",
+        expectSelector: "CSSX: expected selector as a start of the nested block"
+      }
+    });
+  }
+
   pp.cssxParseNestedSelectors = function (options) {
     let nestedElement, result;
     nestedElement = this.startNodeAt(this.state.start, this.state.startLoc);
@@ -103,13 +121,13 @@ export default function (Babylon) {
     this.cssxStoreCurrentToken();
 
     if (!this.cssxMatchNextToken(tt.braceL)) {
-      this.raise(this.state.pos, "CSSX: expected { after query definition");
+      this.raise(this.state.pos, "CSSX: expected { after nested selector definition");
     }
 
     ++this.state.pos;
     this.finishToken(options.tokens.start);
 
-    if (this.cssxMatchNextToken(tt.braceR)) { // empty media query
+    if (this.cssxMatchNextToken(tt.braceR)) { // empty nested element
       this.cssxStoreCurrentToken();
       this.skipSpace();
       this.cssxSyncLocPropsToCurPos();

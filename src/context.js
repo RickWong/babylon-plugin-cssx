@@ -12,6 +12,7 @@ export default function (Babylon) {
   tc.cssxValue = new TokContext("cssxValue");
   tc.cssxMediaQuery = new TokContext("CSSXMediaQuery");
   tc.cssxKeyframes = new TokContext("CSSXKeyframes");
+  tc.cssxNested = new TokContext("CSSXNested");
 
   const registerInOut = function (name, context) {
     pp["cssx" + name + "In"] = function () {
@@ -35,6 +36,7 @@ export default function (Babylon) {
   registerInOut("MediaQuery", tc.cssxMediaQuery);
   registerInOut("Keyframes", tc.cssxKeyframes);
   registerInOut("Definition", tc.cssxDefinition);
+  registerInOut("Nested", tc.cssxNested);
 
 }
 

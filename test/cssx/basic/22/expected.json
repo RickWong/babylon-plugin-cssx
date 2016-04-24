@@ -71,7 +71,9 @@
                   "column": 11
                 }
               },
-              "value": "#styles.p"
+              "value": "#styles.p",
+              "leadingComments": null,
+              "trailingComments": null
             },
             "body": {
               "type": "CSSXRules",
@@ -116,7 +118,26 @@
                         "column": 9
                       }
                     },
-                    "name": "color"
+                    "name": "color",
+                    "leadingComments": null,
+                    "trailingComments": [
+                      {
+                        "type": "CommentLine",
+                        "value": " a",
+                        "start": 36,
+                        "end": 40,
+                        "loc": {
+                          "start": {
+                            "line": 3,
+                            "column": 16
+                          },
+                          "end": {
+                            "line": 3,
+                            "column": 20
+                          }
+                        }
+                      }
+                    ]
                   },
                   "body": {
                     "type": "CSSXValue",
@@ -137,6 +158,22 @@
                     "trailingComments": null
                   },
                   "trailingComments": [
+                    {
+                      "type": "CommentLine",
+                      "value": " a",
+                      "start": 36,
+                      "end": 40,
+                      "loc": {
+                        "start": {
+                          "line": 3,
+                          "column": 16
+                        },
+                        "end": {
+                          "line": 3,
+                          "column": 20
+                        }
+                      }
+                    },
                     {
                       "type": "CommentLine",
                       "value": " a",

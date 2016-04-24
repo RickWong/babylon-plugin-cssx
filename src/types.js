@@ -17,6 +17,9 @@ export default function (Babylon) {
   tt.cssxKeyframes = new TokenType("CSSXKeyframes");
   tt.cssxKeyframesStart = new TokenType("CSSXKeyframesStart");
   tt.cssxKeyframesEnd = new TokenType("CSSXKeyframesEnd");
+  tt.cssxNested = new TokenType("CSSXNested");
+  tt.cssxNestedStart = new TokenType("CSSXNestedStart");
+  tt.cssxNestedEnd = new TokenType("CSSXNestedEnd");
 
   tt.cssxRulesStart.updateContext = function (prevType) {
     if (eq.type(prevType, tt.cssxSelector)) this.state.context.push(tc.cssxRules);
@@ -44,6 +47,10 @@ export default function (Babylon) {
 
   tt.cssxKeyframesEnd.updateContext = function () {
     this.cssxKeyframesOut();
+  };
+
+  tt.cssxNestedEnd.updateContext = function () {
+    this.cssxNestedOut();
   };
 
 };

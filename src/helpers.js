@@ -1,7 +1,7 @@
 import { posToLoc, eq } from "./utilities";
 
 export default function (Babylon) {
-  var { Token, pp } = Babylon;
+  var { Token, pp, tt } = Babylon;
 
   const MediaQueryEntryPoint = "@media ";
   const keyframesEntryPoint = [
@@ -25,6 +25,27 @@ export default function (Babylon) {
     }
     return false;
   };
+
+  pp.cssxIsNestedElement = function () {
+    let old = this.state, result = false, future;
+
+    this.state = old.clone(true);
+
+    this.isLookahead = true;
+    try {
+      this.next();
+      this.skipSpace();
+      this.cssxReadSelector();
+      future = this.cssxLookahead();
+      if (future.first.type === tt.braceL) {
+        result = true;
+      }
+    } catch (e) {}
+    this.isLookahead = false;
+    this.state = old;
+
+    return result;
+  }
 
   pp.cssxGetPreviousToken = function (steps=0) {
     return this.state.tokens[this.state.tokens.length - (steps+1)];
