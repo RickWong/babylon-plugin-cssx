@@ -37,7 +37,7 @@ export default function (Babylon) {
       this.skipSpace();
       this.cssxReadSelector();
       future = this.cssxLookahead();
-      if (future.first.type === tt.braceL) {
+      if (eq.type(future.first.type, tt.braceL)) {
         result = true;
       }
     } catch (e) {}
