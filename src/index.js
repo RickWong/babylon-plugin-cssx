@@ -132,7 +132,7 @@ export default function CSSX(Parser) {
           }
 
           // looping through the cssx elements
-          if (eq.context(context, tc.cssxDefinition) || eq.context(context, tc.cssxMediaQuery) || eq.context(context, tc.cssxKeyframes) || eq.context(context, tc.cssxNested)) {
+          if (eq.context(context, tc.cssxDefinition) || eq.context(context, tc.cssxNested)) {
             this.skipSpace();
             return this.cssxReadSelector();
           }

@@ -11,12 +11,6 @@ export default function (Babylon) {
   tt.cssxRulesEnd = new TokenType("CSSXRulesEnd");
   tt.cssxProperty = new TokenType("CSSXProperty");
   tt.cssxValue = new TokenType("CSSXValue");
-  tt.cssxMediaQuery = new TokenType("CSSXMediaQuery");
-  tt.cssxMediaQueryStart = new TokenType("CSSXMediaQueryStart");
-  tt.cssxMediaQueryEnd = new TokenType("CSSXMediaQueryEnd");
-  tt.cssxKeyframes = new TokenType("CSSXKeyframes");
-  tt.cssxKeyframesStart = new TokenType("CSSXKeyframesStart");
-  tt.cssxKeyframesEnd = new TokenType("CSSXKeyframesEnd");
   tt.cssxNested = new TokenType("CSSXNested");
   tt.cssxNestedStart = new TokenType("CSSXNestedStart");
   tt.cssxNestedEnd = new TokenType("CSSXNestedEnd");
@@ -40,14 +34,6 @@ export default function (Babylon) {
   };
   tt.cssxSelector.updateContext = function () {
     this.state.context.length -= 1;
-  };
-
-  tt.cssxMediaQueryEnd.updateContext = function () {
-    this.cssxMediaQueryOut();
-  };
-
-  tt.cssxKeyframesEnd.updateContext = function () {
-    this.cssxKeyframesOut();
   };
 
   tt.cssxNestedEnd.updateContext = function () {

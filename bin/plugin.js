@@ -17,8 +17,6 @@ exports.default = function (Babylon) {
   tc.cssxRules = new TokContext("cssxRules");
   tc.cssxProperty = new TokContext("cssxProperty");
   tc.cssxValue = new TokContext("cssxValue");
-  tc.cssxMediaQuery = new TokContext("CSSXMediaQuery");
-  tc.cssxKeyframes = new TokContext("CSSXKeyframes");
   tc.cssxNested = new TokContext("CSSXNested");
 
   var registerInOut = function registerInOut(name, context) {
@@ -40,8 +38,6 @@ exports.default = function (Babylon) {
   };
 
   registerInOut("", tc.cssx);
-  registerInOut("MediaQuery", tc.cssxMediaQuery);
-  registerInOut("Keyframes", tc.cssxKeyframes);
   registerInOut("Definition", tc.cssxDefinition);
   registerInOut("Nested", tc.cssxNested);
 };
@@ -110,24 +106,6 @@ exports.default = function (Babylon) {
   var tt = Babylon.tt;
 
 
-  var MediaQueryEntryPoint = "@media ";
-  var keyframesEntryPoint = ["@keyframes", "@-webkit-keyframes", "@-moz-keyframes", "@-o-keyframes"];
-
-  pp.cssxIsMediaQuery = function () {
-    if (this.state.value.toString().indexOf(MediaQueryEntryPoint) === 0) {
-      return true;
-    }
-    return false;
-  };
-
-  pp.cssxIsKeyFramesEntryPoint = function () {
-    var value = this.state.value.toString().split(" ")[0];
-    if (keyframesEntryPoint.indexOf(value) >= 0) {
-      return true;
-    }
-    return false;
-  };
-
   pp.cssxIsNestedElement = function () {
     var old = this.state,
         result = false,
@@ -137,7 +115,6 @@ exports.default = function (Babylon) {
 
     this.isLookahead = true;
     try {
-      this.next();
       this.skipSpace();
       this.cssxReadSelector();
       future = this.cssxLookahead();
@@ -369,13 +346,6 @@ function CSSX(Parser) {
             this.cssxDefinitionIn();
             return this.cssxParse();
           } else if (this.match(_types.types.cssxSelector)) {
-            if (this.cssxIsMediaQuery()) {
-              return this.cssxParseMediaQueryElement();
-            } else if (this.cssxIsKeyFramesEntryPoint()) {
-              return this.cssxParseKeyframesElement();
-            } else if (this.cssxIsNestedElement()) {
-              return this.cssxParseNestedElement();
-            }
             return this.cssxParseElement();
           }
           return inner.call(this, declaration, topLevel);
@@ -392,6 +362,7 @@ function CSSX(Parser) {
           var context = this.curContext(),
               blockStmtNode = void 0;
           var rules = [],
+              nested = [],
               lastToken = void 0;
 
           if (_utilities.eq.context(context, _context.types.cssxRules) && this.match(_types.types.cssxRulesStart)) {
@@ -401,13 +372,20 @@ function CSSX(Parser) {
             if (this.match(_types.types.cssxRulesStart) && _utilities.eq.type(this.lookahead().type, _types.types.braceR)) {
               this.next();
             } else {
-              // reading the style         
+              // reading the style
               while (!this.match(_types.types.cssxRulesEnd) && !this.match(_types.types.eof)) {
-                rules.push(this.cssxParseRule(this.cssxReadProperty(), this.cssxReadValue()));
+                if (this.cssxIsNestedElement()) {
+                  nested.push(this.cssxParseNestedElement());
+                } else {
+                  rules.push(this.cssxParseRule(this.cssxReadProperty(), this.cssxReadValue()));
+                }
               }
               if (this.state.pos >= this.input.length) this.finishToken(_types.types.eof);
             }
             blockStmtNode.body = rules;
+            if (nested.length > 0) {
+              blockStmtNode.nested = nested;
+            }
             lastToken = this.cssxGetPreviousToken();
             return this.finishNodeAt(blockStmtNode, 'CSSXRules', lastToken.end, lastToken.loc.end);
           }
@@ -456,12 +434,11 @@ function CSSX(Parser) {
               } else if (this.match(_types.types.cssxValue) && this.cssxMatchNextToken(_types.types.braceR)) {
                 // ending without semicolon
                 return this.cssxStoreNextCharAsToken(_types.types.cssxRulesEnd);
-              } else if (this.match(_types.types.cssxRulesEnd) && _utilities.eq.context(context, _context.types.cssxMediaQuery) || this.match(_types.types.cssxRulesEnd) && _utilities.eq.context(context, _context.types.cssxKeyframes) || this.match(_types.types.cssxRulesEnd) && _utilities.eq.context(context, _context.types.cssxNested)) {
-                // end of nested element
-                return;
-              } else if (this.match(_types.types.cssxRulesEnd) && this.cssxMatchNextToken(_types.types.parenR) || this.match(_types.types.cssxMediaQueryEnd) && this.cssxMatchNextToken(_types.types.parenR) || this.match(_types.types.cssxKeyframesEnd) && this.cssxMatchNextToken(_types.types.parenR) || this.match(_types.types.cssxNestedEnd) && this.cssxMatchNextToken(_types.types.parenR)) {
+              } else if (this.match(_types.types.cssxRulesEnd) && this.cssxMatchNextToken(_types.types.parenR)) {
                 ++this.state.pos;
                 this.finishToken(_types.types.cssxEnd);
+                return;
+              } else if (this.match(_types.types.cssxRulesEnd) && _utilities.eq.context(context, _context.types.cssxNested)) {
                 return;
               }
 
@@ -471,7 +448,7 @@ function CSSX(Parser) {
           }
 
           // looping through the cssx elements
-          if (_utilities.eq.context(context, _context.types.cssxDefinition) || _utilities.eq.context(context, _context.types.cssxMediaQuery) || _utilities.eq.context(context, _context.types.cssxKeyframes) || _utilities.eq.context(context, _context.types.cssxNested)) {
+          if (_utilities.eq.context(context, _context.types.cssxDefinition) || _utilities.eq.context(context, _context.types.cssxNested)) {
             this.skipSpace();
             return this.cssxReadSelector();
           }
@@ -607,13 +584,7 @@ exports.default = function (Babylon) {
     exprNode.body = [];
 
     while (this.match(tt.cssxSelector)) {
-      if (this.cssxIsMediaQuery()) {
-        exprNode.body.push(this.cssxParseMediaQueryElement());
-      } else if (this.cssxIsKeyFramesEntryPoint()) {
-        exprNode.body.push(this.cssxParseKeyframesElement());
-      } else {
-        exprNode.body.push(this.cssxParseElement());
-      }
+      exprNode.body.push(this.cssxParseElement());
     }
 
     result = this.finishNodeAt(exprNode, "CSSXExpression", this.state.end, this.state.endLoc);
@@ -639,62 +610,19 @@ exports.default = function (Babylon) {
     }
     lastToken = this.cssxGetPreviousToken();
     result = this.finishNodeAt(elementNode, "CSSXElement", lastToken.end, lastToken.loc.end);
+
     this.nextToken();
     return result;
   };
 
-  pp.cssxParseMediaQueryElement = function () {
-    var _this = this;
-
-    return this.cssxParseNestedSelectors({
-      name: "CSSXMediaQueryElement",
-      context: {
-        in: function _in() {
-          return _this.cssxMediaQueryIn();
-        }
-      },
-      tokens: {
-        el: tt.cssxMediaQuery,
-        start: tt.cssxMediaQueryStart,
-        end: tt.cssxMediaQueryEnd
-      },
-      errors: {
-        unclosed: "CSSX: unclosed media query block",
-        expectSelector: "CSSX: expected css selector after media query definition"
-      }
-    });
-  };
-
-  pp.cssxParseKeyframesElement = function () {
-    var _this2 = this;
-
-    return this.cssxParseNestedSelectors({
-      name: "CSSXKeyframesElement",
-      context: {
-        in: function _in() {
-          return _this2.cssxKeyframesIn();
-        }
-      },
-      tokens: {
-        el: tt.cssxKeyframes,
-        start: tt.cssxKeyframesStart,
-        end: tt.cssxKeyframesEnd
-      },
-      errors: {
-        unclosed: "CSSX: unclosed @keyframes block",
-        expectSelector: "CSSX: expected keyframe as a start of the @keyframes block"
-      }
-    });
-  };
-
   pp.cssxParseNestedElement = function () {
-    var _this3 = this;
+    var _this = this;
 
     return this.cssxParseNestedSelectors({
       name: "CSSXNestedElement",
       context: {
         in: function _in() {
-          return _this3.cssxNestedIn();
+          return _this.cssxNestedIn();
         }
       },
       tokens: {
@@ -710,22 +638,12 @@ exports.default = function (Babylon) {
   };
 
   pp.cssxParseNestedSelectors = function (options) {
-    var nestedElement = void 0,
-        result = void 0;
-    nestedElement = this.startNodeAt(this.state.start, this.state.startLoc);
-    nestedElement.query = this.state.value;
+    var result = void 0;
 
-    this.cssxExpressionSet(nestedElement);
+    if (this.match(tt.cssxRulesStart)) this.next();
+
     options.context.in();
-    this.cssxFinishTokenAt(options.tokens.el, this.state.value, this.state.end, this.state.endLoc);
-    this.cssxStoreCurrentToken();
-
-    if (!this.cssxMatchNextToken(tt.braceL)) {
-      this.raise(this.state.pos, "CSSX: expected { after nested selector definition");
-    }
-
-    ++this.state.pos;
-    this.finishToken(options.tokens.start);
+    this.cssxFinishTokenAt(options.tokens.start, this.state.value, this.state.end, this.state.endLoc);
 
     if (this.cssxMatchNextToken(tt.braceR)) {
       // empty nested element
@@ -734,27 +652,19 @@ exports.default = function (Babylon) {
       this.cssxSyncLocPropsToCurPos();
     } else {
       this.next();
-      nestedElement.body = [];
       if (this.match(tt.cssxSelector)) {
-        nestedElement.body.push(this.cssxParseElement());
-        while (!this.cssxMatchNextToken(tt.braceR)) {
-          if (this.match(tt.cssxRulesEnd)) {
-            this.cssxReadSelector();
-          }
-          if (this.cssxMatchNextToken(tt.parenR)) {
-            this.raise(this.state.pos, options.errors.unclosed);
-          }
-          nestedElement.body.push(this.cssxParseElement());
-        }
+        result = this.cssxParseElement();
       } else {
         this.raise(this.state.pos, options.errors.expectSelector);
       }
     }
 
-    ++this.state.pos;
     this.finishToken(options.tokens.end);
-    result = this.finishNodeAt(nestedElement, options.name, this.state.end, this.state.endLoc);
-    this.next();
+    this.cssxStoreCurrentToken();
+    if (this.cssxMatchNextToken(tt.braceR)) {
+      this.cssxStoreNextCharAsToken(tt.cssxRulesEnd);
+    }
+
     return result;
   };
 
@@ -1067,12 +977,6 @@ exports.default = function (Babylon) {
   tt.cssxRulesEnd = new TokenType("CSSXRulesEnd");
   tt.cssxProperty = new TokenType("CSSXProperty");
   tt.cssxValue = new TokenType("CSSXValue");
-  tt.cssxMediaQuery = new TokenType("CSSXMediaQuery");
-  tt.cssxMediaQueryStart = new TokenType("CSSXMediaQueryStart");
-  tt.cssxMediaQueryEnd = new TokenType("CSSXMediaQueryEnd");
-  tt.cssxKeyframes = new TokenType("CSSXKeyframes");
-  tt.cssxKeyframesStart = new TokenType("CSSXKeyframesStart");
-  tt.cssxKeyframesEnd = new TokenType("CSSXKeyframesEnd");
   tt.cssxNested = new TokenType("CSSXNested");
   tt.cssxNestedStart = new TokenType("CSSXNestedStart");
   tt.cssxNestedEnd = new TokenType("CSSXNestedEnd");
@@ -1081,7 +985,7 @@ exports.default = function (Babylon) {
     if (_utilities.eq.type(prevType, tt.cssxSelector)) this.state.context.push(tc.cssxRules);
   };
   tt.cssxRulesEnd.updateContext = function (prevType) {
-    if (_utilities.eq.type(prevType, tt.cssxValue) || _utilities.eq.type(prevType, tt.cssxRulesStart) || _utilities.eq.type(prevType, tt.semi)) {
+    if (_utilities.eq.type(prevType, tt.cssxValue) || _utilities.eq.type(prevType, tt.cssxRulesStart) || _utilities.eq.type(prevType, tt.semi) || _utilities.eq.type(prevType, tt.cssxNestedEnd)) {
       this.state.context.length -= 1; // out of cssxRules
     }
   };
@@ -1091,14 +995,6 @@ exports.default = function (Babylon) {
   };
   tt.cssxSelector.updateContext = function () {
     this.state.context.length -= 1;
-  };
-
-  tt.cssxMediaQueryEnd.updateContext = function () {
-    this.cssxMediaQueryOut();
-  };
-
-  tt.cssxKeyframesEnd.updateContext = function () {
-    this.cssxKeyframesOut();
   };
 
   tt.cssxNestedEnd.updateContext = function () {

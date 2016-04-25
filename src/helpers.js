@@ -3,29 +3,6 @@ import { posToLoc, eq } from "./utilities";
 export default function (Babylon) {
   var { Token, pp, tt } = Babylon;
 
-  const MediaQueryEntryPoint = "@media ";
-  const keyframesEntryPoint = [
-    "@keyframes",
-    "@-webkit-keyframes",
-    "@-moz-keyframes",
-    "@-o-keyframes"
-  ];
-
-  pp.cssxIsMediaQuery = function () {
-    if (this.state.value.toString().indexOf(MediaQueryEntryPoint) === 0) {
-      return true;
-    }
-    return false;
-  };
-
-  pp.cssxIsKeyFramesEntryPoint = function () {
-    let value = this.state.value.toString().split(" ")[0];
-    if (keyframesEntryPoint.indexOf(value) >= 0) {
-      return true;
-    }
-    return false;
-  };
-
   pp.cssxIsNestedElement = function () {
     let old = this.state, result = false, future;
 

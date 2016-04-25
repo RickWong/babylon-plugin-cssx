@@ -21,13 +21,7 @@ export default function (Babylon) {
     exprNode.body = [];
 
     while (this.match(tt.cssxSelector)) {
-      if (this.cssxIsMediaQuery()) {
-        exprNode.body.push(this.cssxParseMediaQueryElement());
-      } else if (this.cssxIsKeyFramesEntryPoint()) {
-        exprNode.body.push(this.cssxParseKeyframesElement());
-      } else {
-        exprNode.body.push(this.cssxParseElement());
-      }
+      exprNode.body.push(this.cssxParseElement());
     }
 
     result = this.finishNodeAt(exprNode, "CSSXExpression", this.state.end, this.state.endLoc);
@@ -55,42 +49,6 @@ export default function (Babylon) {
 
     this.nextToken();
     return result;
-  };
-
-  pp.cssxParseMediaQueryElement = function () {
-    return this.cssxParseNestedSelectors({
-      name: "CSSXMediaQueryElement",
-      context: {
-        in: () => this.cssxMediaQueryIn()
-      },
-      tokens: {
-        el: tt.cssxMediaQuery,
-        start: tt.cssxMediaQueryStart,
-        end: tt.cssxMediaQueryEnd
-      },
-      errors: {
-        unclosed: "CSSX: unclosed media query block",
-        expectSelector: "CSSX: expected css selector after media query definition"
-      }
-    });
-  };
-
-  pp.cssxParseKeyframesElement = function () {
-    return this.cssxParseNestedSelectors({
-      name: "CSSXKeyframesElement",
-      context: {
-        in: () => this.cssxKeyframesIn()
-      },
-      tokens: {
-        el: tt.cssxKeyframes,
-        start: tt.cssxKeyframesStart,
-        end: tt.cssxKeyframesEnd
-      },
-      errors: {
-        unclosed: "CSSX: unclosed @keyframes block",
-        expectSelector: "CSSX: expected keyframe as a start of the @keyframes block"
-      }
-    });
   };
 
   pp.cssxParseNestedElement = function () {
