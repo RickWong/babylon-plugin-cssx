@@ -44,7 +44,7 @@
         },
         "body": [
           {
-            "type": "CSSXMediaQueryElement",
+            "type": "CSSXElement",
             "start": 8,
             "end": 75,
             "loc": {
@@ -57,7 +57,38 @@
                 "column": 1
               }
             },
-            "query": "@media screen and (max-width: 1000px) and (min-width: 700px)"
+            "selector": {
+              "type": "CSSXSelector",
+              "start": 8,
+              "end": 68,
+              "loc": {
+                "start": {
+                  "line": 2,
+                  "column": 2
+                },
+                "end": {
+                  "line": 2,
+                  "column": 62
+                }
+              },
+              "value": "@media screen and (max-width: 1000px) and (min-width: 700px)"
+            },
+            "body": {
+              "type": "CSSXRules",
+              "start": 69,
+              "end": 75,
+              "loc": {
+                "start": {
+                  "line": 2,
+                  "column": 63
+                },
+                "end": {
+                  "line": 4,
+                  "column": 1
+                }
+              },
+              "body": []
+            }
           }
         ],
         "directives": []
@@ -95,7 +126,7 @@
     },
     {
       "type": {
-        "label": "CSSXMediaQuery",
+        "label": "CSSXSelector",
         "beforeExpr": false,
         "startsExpr": false,
         "rightAssociative": false,
@@ -103,8 +134,7 @@
         "isAssign": false,
         "prefix": false,
         "postfix": false,
-        "binop": null,
-        "updateContext": null
+        "binop": null
       },
       "value": "@media screen and (max-width: 1000px) and (min-width: 700px)",
       "start": 8,
@@ -122,7 +152,7 @@
     },
     {
       "type": {
-        "label": "CSSXMediaQueryStart",
+        "label": "CSSXRulesStart",
         "beforeExpr": false,
         "startsExpr": false,
         "rightAssociative": false,
@@ -130,8 +160,7 @@
         "isAssign": false,
         "prefix": false,
         "postfix": false,
-        "binop": null,
-        "updateContext": null
+        "binop": null
       },
       "start": 69,
       "end": 70,
@@ -148,7 +177,7 @@
     },
     {
       "type": {
-        "label": "CSSXMediaQueryEnd",
+        "label": "CSSXRulesEnd",
         "beforeExpr": false,
         "startsExpr": false,
         "rightAssociative": false,

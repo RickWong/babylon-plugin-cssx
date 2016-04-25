@@ -28,7 +28,8 @@ export default function (Babylon) {
     if (
       eq.type(prevType, tt.cssxValue) ||
       eq.type(prevType, tt.cssxRulesStart) ||
-      eq.type(prevType, tt.semi)
+      eq.type(prevType, tt.semi) ||
+      eq.type(prevType, tt.cssxNestedEnd)
     ) {
       this.state.context.length -= 1; // out of cssxRules
     }

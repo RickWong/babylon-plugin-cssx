@@ -37,7 +37,7 @@ var parse = function (code, opts) {
 
 
 var tests = [];
-// var only = 'basic/22'.split(',');
+// var only = 'nested/49'.split(',');
 
 glob.sync(__dirname + '/cssx/**/actual.js').forEach(function (actual) {
   var testDir = path.dirname(actual), testDirParts = testDir.split('/');

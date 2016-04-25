@@ -40,13 +40,6 @@ export default function CSSX(Parser) {
             this.cssxDefinitionIn();
             return this.cssxParse();
           } else if (this.match(tt.cssxSelector)) {
-            if (this.cssxIsMediaQuery()) {
-              return this.cssxParseMediaQueryElement();
-            } else if (this.cssxIsKeyFramesEntryPoint()) {
-              return this.cssxParseKeyframesElement();
-            } else if (this.cssxIsNestedElement()) {
-              return this.cssxParseNestedElement();
-            }
             return this.cssxParseElement();
           }
           return inner.call(this, declaration, topLevel);
@@ -57,7 +50,7 @@ export default function CSSX(Parser) {
         return function (allowDirectives) {
           let fallback = () => inner.call(this, allowDirectives);
           let context = this.curContext(), blockStmtNode;
-          let rules = [], lastToken;
+          let rules = [], nested = [], lastToken;
 
           if (eq.context(context, tc.cssxRules) && this.match(tt.cssxRulesStart)) {
 
@@ -66,13 +59,20 @@ export default function CSSX(Parser) {
             if (this.match(tt.cssxRulesStart) && eq.type(this.lookahead().type, tt.braceR)) {
               this.next();
             } else {
-              // reading the style          
+              // reading the style
               while (!this.match(tt.cssxRulesEnd) && !this.match(tt.eof)) {
-                rules.push(this.cssxParseRule(this.cssxReadProperty(), this.cssxReadValue()));
+                if (this.cssxIsNestedElement()) {
+                  nested.push(this.cssxParseNestedElement());
+                } else {
+                  rules.push(this.cssxParseRule(this.cssxReadProperty(), this.cssxReadValue()));
+                }
               }
               if (this.state.pos >= this.input.length) this.finishToken(tt.eof);
             }
             blockStmtNode.body = rules;
+            if (nested.length > 0) {
+              blockStmtNode.nested = nested;
+            }
             lastToken = this.cssxGetPreviousToken();
             return this.finishNodeAt(
               blockStmtNode, 'CSSXRules', lastToken.end, lastToken.loc.end
@@ -118,21 +118,11 @@ export default function CSSX(Parser) {
           } else if (this.match(tt.cssxValue) && this.cssxMatchNextToken(tt.braceR)) {
             // ending without semicolon
             return this.cssxStoreNextCharAsToken(tt.cssxRulesEnd);
-          } else if (
-            (this.match(tt.cssxRulesEnd) && eq.context(context, tc.cssxMediaQuery)) ||
-            (this.match(tt.cssxRulesEnd) && eq.context(context, tc.cssxKeyframes)) ||
-            (this.match(tt.cssxRulesEnd) && eq.context(context, tc.cssxNested))
-          ) {
-            // end of nested element
-            return;
-          } else if (
-            (this.match(tt.cssxRulesEnd) && this.cssxMatchNextToken(tt.parenR)) ||
-            (this.match(tt.cssxMediaQueryEnd) && this.cssxMatchNextToken(tt.parenR)) ||
-            (this.match(tt.cssxKeyframesEnd) && this.cssxMatchNextToken(tt.parenR)) ||
-            (this.match(tt.cssxNestedEnd) && this.cssxMatchNextToken(tt.parenR))
-          ) {
+          } else if (this.match(tt.cssxRulesEnd) && this.cssxMatchNextToken(tt.parenR)) {
             ++this.state.pos;
             this.finishToken(tt.cssxEnd);
+            return;
+          } else if (this.match(tt.cssxRulesEnd) && eq.context(context, tc.cssxNested)) {
             return;
           }
 

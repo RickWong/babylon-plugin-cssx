@@ -52,6 +52,7 @@ export default function (Babylon) {
     }
     lastToken = this.cssxGetPreviousToken();
     result = this.finishNodeAt(elementNode, "CSSXElement", lastToken.end, lastToken.loc.end);
+
     this.nextToken();
     return result;
   };
@@ -111,21 +112,12 @@ export default function (Babylon) {
   }
 
   pp.cssxParseNestedSelectors = function (options) {
-    let nestedElement, result;
-    nestedElement = this.startNodeAt(this.state.start, this.state.startLoc);
-    nestedElement.query = this.state.value;
+    let result;
 
-    this.cssxExpressionSet(nestedElement);
+    if (this.match(tt.cssxRulesStart)) this.next();
+
     options.context.in();
-    this.cssxFinishTokenAt(options.tokens.el, this.state.value, this.state.end, this.state.endLoc);
-    this.cssxStoreCurrentToken();
-
-    if (!this.cssxMatchNextToken(tt.braceL)) {
-      this.raise(this.state.pos, "CSSX: expected { after nested selector definition");
-    }
-
-    ++this.state.pos;
-    this.finishToken(options.tokens.start);
+    this.cssxFinishTokenAt(options.tokens.start, this.state.value, this.state.end, this.state.endLoc);
 
     if (this.cssxMatchNextToken(tt.braceR)) { // empty nested element
       this.cssxStoreCurrentToken();
@@ -133,27 +125,19 @@ export default function (Babylon) {
       this.cssxSyncLocPropsToCurPos();
     } else {
       this.next();
-      nestedElement.body = [];
       if (this.match(tt.cssxSelector)) {
-        nestedElement.body.push(this.cssxParseElement());
-        while (!this.cssxMatchNextToken(tt.braceR)) {
-          if (this.match(tt.cssxRulesEnd)) {
-            this.cssxReadSelector();
-          }
-          if (this.cssxMatchNextToken(tt.parenR)) {
-            this.raise(this.state.pos, options.errors.unclosed);
-          }
-          nestedElement.body.push(this.cssxParseElement());
-        }
+        result = this.cssxParseElement();
       } else {
         this.raise(this.state.pos, options.errors.expectSelector);
       }
     }
 
-    ++this.state.pos;
     this.finishToken(options.tokens.end);
-    result = this.finishNodeAt(nestedElement, options.name, this.state.end, this.state.endLoc);
-    this.next();
+    this.cssxStoreCurrentToken();
+    if (this.cssxMatchNextToken(tt.braceR)) {
+      this.cssxStoreNextCharAsToken(tt.cssxRulesEnd);
+    }
+
     return result;
   };
 

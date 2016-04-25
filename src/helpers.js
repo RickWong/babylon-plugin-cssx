@@ -33,7 +33,6 @@ export default function (Babylon) {
 
     this.isLookahead = true;
     try {
-      this.next();
       this.skipSpace();
       this.cssxReadSelector();
       future = this.cssxLookahead();
