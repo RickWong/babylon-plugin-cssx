@@ -954,7 +954,7 @@ var _utilities = require("./utilities");
 
 var CSSXPropertyAllowedCodes = exports.CSSXPropertyAllowedCodes = ["-"].map(_utilities.stringToCode);
 
-var CSSXValueAllowedCodes = exports.CSSXValueAllowedCodes = [" ", "\n", "\t", "#", ".", "-", "(", ")", "[", "]", "'", "\"", "%", ",", ":", "/", "\\", "!", "?"].map(_utilities.stringToCode);
+var CSSXValueAllowedCodes = exports.CSSXValueAllowedCodes = [" ", "\n", "\t", "#", ".", "-", "(", ")", "[", "]", "'", "\"", "%", ",", ":", "/", "\\", "!", "?", "+"].map(_utilities.stringToCode);
 
 var CSSXSelectorAllowedCodes = exports.CSSXSelectorAllowedCodes = [" ", "*", ">", "+", "~", ".", ":", "=", "[", "]", "\"", "-", "!", "?", "@", "#", "$", "%", "^", "&", "'", "|", ",", "\n"].map(_utilities.stringToCode);
 },{"./utilities":9}],8:[function(require,module,exports){
